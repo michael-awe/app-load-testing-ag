@@ -1,5 +1,6 @@
 runLoadTest()
 
+//gets CSRF token from cookie
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -15,13 +16,15 @@ function getCookie(name) {
     return cookieValue;
   }
 
-    
+//sends POST request to run load test   
 function runLoadTest(){
 
     button = document.querySelector('#run-load-test')
     console.log(button)
     button.addEventListener('click', function(e){
         e.preventDefault();
+        resultscontainer = document.querySelector('.results');
+        resultscontainer.style.display = 'none';
 
         // Get the CSRF token from the cookie
         const csrftoken = getCookie('csrftoken');
@@ -47,19 +50,25 @@ function runLoadTest(){
             setTimeout(() => {
                 this.innerHTML = '-> Run load test'
             }, 1000);
+
+            if (data.error){
+                alert(data.error);
+                this.disabled = false;
+                return;
+            }
             displayResults(data);
             this.disabled = false;
             
 
           }).catch(error => {
-            console.log(error)
+            
           });
 
     });
 
 }
 
-
+//displays result graphs
 function displayResults(data){
     console.log('displaying results')
     
@@ -110,7 +119,10 @@ function displayResults(data){
     num_memory_points = data.memory_usage.length;
     interval = data.duration / num_memory_points;
     let memory_labels = [];
-    for(let i = 0; i < num_memory_points; i++){
+    if (num_memory_points > 10){
+        inc = Math.ceil(num_memory_points/10)
+    }
+    for(let i = 0; i < num_memory_points; i+=inc){
         memory_labels.push((i * interval).toFixed(2)+'s');
     }
 
@@ -131,7 +143,10 @@ function displayResults(data){
     num_cpu_points = data.cpu_usage.length;
     interval = data.duration / num_cpu_points;
     let cpu_labels = [];
-    for(let i = 0; i < num_cpu_points; i++){
+    if (num_cpu_points > 10){
+        inc = Math.ceil(num_cpu_points/10)
+    }
+    for(let i = 0; i < num_cpu_points; i+inc){
         cpu_labels.push((i * interval).toFixed(2)+'s');
     }
     let cpuChart = new Chart(cpu_graph, {
@@ -150,7 +165,12 @@ function displayResults(data){
     num_active_threads_points = data.active_threads.length;
     interval = data.duration / num_active_threads_points;
     let active_threads_labels = [];
-    for(let i = 0; i < num_active_threads_points; i++){
+    if (num_active_threads_points > 10){
+        inc = Math.ceil(num_active_threads_points/10)
+    } else{
+        inc = 1;
+    }
+    for(let i = 0; i < num_active_threads_points; i+=inc){
         active_threads_labels.push((i * interval).toFixed(2)+'s');
     }
     let activeThreadsChart = new Chart(active_threads_graph, {
@@ -170,7 +190,14 @@ function displayResults(data){
     response_time_labels = [];
     response_time_data = [];
     interval = data.duration / num_response_time_points;
-    for(let i = 0; i < num_response_time_points; i+=Math.ceil(num_response_time_points/10)){
+
+    if (response_time_points > 100){
+        inc = Math.ceil(num_response_time_points/10)
+    } else{
+        inc = 1;
+    }
+        inc = Math.ceil(num_response_time_points/10)
+    for(let i = 0; i < num_response_time_points; i+=inc){
         response_time_labels.push((i * interval).toFixed(2)+'s');
         response_time_data.push(data.response_times[i]);
     }

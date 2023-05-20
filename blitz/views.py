@@ -30,7 +30,7 @@ async def run_load_test(request):
 
     #Validation
     if not url:
-        return JsonResponse({'error': 'URL required.'}, status=400)
+        return JsonResponse({'error': 'Please enter a URL.'}, status=400)
     if not num_requests:
         return JsonResponse({'error': 'Number of requests required.'}, status=400)
     

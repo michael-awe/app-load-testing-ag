@@ -48,6 +48,7 @@ $ python manage.py makemigrations && python manage.py migrate
 ```
 
 ### Running the application
+After activating your virtual environment,
 ```bash
 # Run the app
 $ python manage.py runserver
