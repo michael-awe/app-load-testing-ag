@@ -70,6 +70,7 @@ function runLoadTest(){
 
 //displays result graphs
 function displayResults(data){
+    var inc = 1;
     console.log('displaying results')
     
     //main container
@@ -119,11 +120,15 @@ function displayResults(data){
     num_memory_points = data.memory_usage.length;
     interval = data.duration / num_memory_points;
     let memory_labels = [];
-    if (num_memory_points > 10){
+    let memory_data = [];
+    if (num_memory_points > 100){
         inc = Math.ceil(num_memory_points/10)
+    } else{
+        inc = 1;
     }
     for(let i = 0; i < num_memory_points; i+=inc){
         memory_labels.push((i * interval).toFixed(2)+'s');
+        memory_data.push(data.memory_usage[i]);
     }
 
     let memoryChart = new Chart(memory_graph, {
@@ -132,7 +137,7 @@ function displayResults(data){
             labels: memory_labels,
             datasets: [{
                 label: 'Memory Usage (MB)',
-                data: data.memory_usage,
+                data: memory_data,
             }],
         },
         options: options
@@ -142,12 +147,16 @@ function displayResults(data){
     //cpu graph
     num_cpu_points = data.cpu_usage.length;
     interval = data.duration / num_cpu_points;
+    cpu_data = [];
     let cpu_labels = [];
-    if (num_cpu_points > 10){
+    if (num_cpu_points > 100){
         inc = Math.ceil(num_cpu_points/10)
+    } else{
+        inc = 1;
     }
-    for(let i = 0; i < num_cpu_points; i+inc){
+    for(let i = 0; i < num_cpu_points; i+=inc){
         cpu_labels.push((i * interval).toFixed(2)+'s');
+        cpu_data.push(data.cpu_usage[i]);
     }
     let cpuChart = new Chart(cpu_graph, {
         type: 'line',
@@ -155,7 +164,7 @@ function displayResults(data){
             labels: memory_labels,
             datasets: [{
                 label: 'CPU Usage (%)',
-                data: data.cpu_usage,
+                data: cpu_data,
             }],
         },
         options: options
@@ -165,13 +174,15 @@ function displayResults(data){
     num_active_threads_points = data.active_threads.length;
     interval = data.duration / num_active_threads_points;
     let active_threads_labels = [];
-    if (num_active_threads_points > 10){
+    active_thread_data = [];
+    if(num_active_threads_points > 100){
         inc = Math.ceil(num_active_threads_points/10)
     } else{
         inc = 1;
     }
     for(let i = 0; i < num_active_threads_points; i+=inc){
         active_threads_labels.push((i * interval).toFixed(2)+'s');
+        active_thread_data.push(data.active_threads[i]);
     }
     let activeThreadsChart = new Chart(active_threads_graph, {
         type: 'line',
@@ -179,7 +190,7 @@ function displayResults(data){
             labels: memory_labels,
             datasets: [{
                 label: 'Active Threads (#)',
-                data: data.active_threads,
+                data: active_thread_data,
             }],
         },
         options: options
@@ -190,13 +201,11 @@ function displayResults(data){
     response_time_labels = [];
     response_time_data = [];
     interval = data.duration / num_response_time_points;
-
-    if (response_time_points > 100){
+    if (num_response_time_points > 100){
         inc = Math.ceil(num_response_time_points/10)
     } else{
         inc = 1;
     }
-        inc = Math.ceil(num_response_time_points/10)
     for(let i = 0; i < num_response_time_points; i+=inc){
         response_time_labels.push((i * interval).toFixed(2)+'s');
         response_time_data.push(data.response_times[i]);
@@ -220,8 +229,15 @@ function displayResults(data){
     num_network_points = data.network_usage['bytes_recv'].length;
     interval = data.duration / num_network_points;
     let network_labels = [];
+    network_sent_data = [];
+    network_recv_data = [];
+    if (num_network_points > 100){
+        inc = Math.ceil(num_network_points/10)
+    }
     for(let i = 0; i < num_network_points; i++){
         network_labels.push((i * interval).toFixed(2)+'s');
+        network_sent_data.push((data.network_usage['bytes_sent'])[i]);
+        network_recv_data.push((data.network_usage['bytes_recv'])[i]);
     }
 
     let networkChart = new Chart(network_graph, {
@@ -230,11 +246,11 @@ function displayResults(data){
             labels: memory_labels,
             datasets: [{
                 label: 'Bytes Sent(MB)',
-                data: data.network_usage['bytes_sent'],
+                data: network_sent_data,
             },
             {
                 label: 'Bytes Received(MB)',
-                data: data.network_usage['bytes_recv'],
+                data: network_recv_data,
             }],
         },
         options: options
