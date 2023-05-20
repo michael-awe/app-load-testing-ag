@@ -22,9 +22,9 @@
 
 ## Key Features
 -  Measure response time, throughput, error rate, and latency of your APIs.
-- Track network usage of your APIs during load testing to identify potential bottlenecks.
+- Measure network usage of your APIs during load testing to identify potential bottlenecks.
 - Analyze HTTP response code distribution to identify areas for improvement in API functionality.
-- Track average and median response times for a more comprehensive understanding of API performance.
+- Track average, median, maximum and minimum response times for a more comprehensive understanding of API performance.
 - Monitor your CPU and memory usage while performing load tests.
 
 ## How To Use
