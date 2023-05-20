@@ -40,7 +40,7 @@ $ git clone git@github.com:michael-awe/app-load-testing-ag.git
 $ cd app-load-testing-ag
 
 # Install dependencies
-$ python -m venv env
+$ python3 -m venv env
 $ source env/bin/activate
 $ pip install -r requirements.txt
 $ python manage.py makemigrations && python manage.py migrate
