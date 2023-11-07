@@ -1,12 +1,9 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
+from .blitz import load_test, measure_system_resources
 
-import asyncio, aiohttp
-import psutil
 import time
-import math
-
-
+import asyncio
 
 # Create your views here.
 def index(request):
@@ -23,16 +20,13 @@ async def run_load_test(request):
     except KeyError:
         return JsonResponse({'error': 'URL and number of requests required.'}, status=400)
 
-    print(request.POST)
-
-    print(url)
-    print(num_requests)
+    print(f"Loadtesting {url} with {num_requests} requests.")
 
     #Validation
     if not url:
-        return JsonResponse({'error': 'Please enter a URL.'}, status=400)
+        return JsonResponse({'error': 'Please enter a URL'}, status=400)
     if not num_requests:
-        return JsonResponse({'error': 'Number of requests required.'}, status=400)
+        return JsonResponse({'error': 'Please enter the number of requests'}, status=400)
     
     try:
         num_requests = int(num_requests)
@@ -52,12 +46,17 @@ async def run_load_test(request):
     network_usage = []
 
     print("Starting load test...")
-    start_time = time.time()
-    measure_sys = asyncio.create_task(measure_system_resources(memory_usage, cpu_usage, active_threads, network_usage))
-    await load_test(url, num_requests, status_codes, num_completed_requests, request_times)
-    measure_sys.cancel()
-    end = time.time()
+    try:
+        start_time = time.time()
+        measure_sys = asyncio.create_task(measure_system_resources(memory_usage, cpu_usage, active_threads, network_usage))
+        await load_test(url, num_requests, status_codes, num_completed_requests, request_times)
+        measure_sys.cancel()
+        end = time.time()
 
+    except:
+        return JsonResponse({'error': 'Unknown error when making requests.'}, status=400)
+
+    # Calculates statistics
     num_400 = 0
     num_500 = 0
     num_200 = 0
@@ -68,6 +67,8 @@ async def run_load_test(request):
             num_500 += 1
         else:
             num_200 += 1
+
+    print(len(status_codes))
 
 
     try:
@@ -109,53 +110,5 @@ async def run_load_test(request):
         'active_threads': active_threads,
     })
 
-async def load_test(url, num_requests, status_codes, num_completed_requests, request_times):
-    """Make the given number of requests to the given URL."""
-    async with aiohttp.ClientSession() as session:
-        tasks = [asyncio.ensure_future(make_request(session, url, status_codes, num_completed_requests, request_times)) for _ in range(num_requests)]
-        results = await asyncio.gather(*tasks)
-        print(len(results))
-    
-    return "Done!"
-            
-async def make_request(session, url, status_codes, num_completed_requests, request_times):
-    """Make a request to the given URL and append the status code and request time to the lists."""
-    async with session.get(url) as response:
-        start = time.time()
-        res_json = await response.json()
-        status = response.status
-        status_codes.append(status)
-        num_completed_requests[0] += 1
-        end = time.time()
-        request_times.append((end - start) * 1000)
-        return response
 
-async def measure_system_resources(memory_usage, cpu_usage, active_threads, network_usage, interval=0.1, samples=5):
-    """Measure system resources and append to lists. Samples every 0.1 seconds by default. Takes 5 samples to get an average by default."""
-    
-    process = psutil.Process()
-    while True:
-
-        temp_memory = []
-        temp_cpu = []
-
-        for i in range(samples):
-            memory = process.memory_info().rss / 1024 ** 2
-            cpu = process.cpu_percent()
-            temp_memory.append(memory)
-            temp_cpu.append(cpu)
-            await asyncio.sleep(interval)
-
-        #gets average memory usage and cpu usage
-        memory = sum(temp_memory) / len(temp_memory)
-        cpu = sum(temp_cpu) / len(temp_cpu)
-        bytes_sent = psutil.net_io_counters().bytes_sent/  1024 ** 2
-        bytes_recv = psutil.net_io_counters().bytes_recv/ 1024 ** 2
-        network_usage.append((bytes_sent, bytes_recv))
-
-        threads = len(asyncio.all_tasks())
-        print(f'Active threads: {threads}')
-        memory_usage.append(memory)
-        cpu_usage.append(cpu)
-        active_threads.append(threads)
 

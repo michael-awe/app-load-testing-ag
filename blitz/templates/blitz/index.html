@@ -3,11 +3,14 @@
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 {% endblock%}
 
 {% block content %}
     <div class="main">
-        
+        <div class="alert" style="display: none;" role="alert">
+            
+        </div>
         <section class="test">
             <div class="title">
                 <img src="{% static 'blitz/images/test_icon.png' %}" alt="test icon">

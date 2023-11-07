@@ -37,7 +37,7 @@ To clone and run this application, you'll need [Git](https://git-scm.com) , [Pyt
 $ git clone git@github.com:michael-awe/app-load-testing-ag.git
 
 # Go into the repository
-$ cd app-load-testing-ag
+$ cd blitz
 
 # Install dependencies
 $ python3 -m venv env
@@ -69,5 +69,4 @@ This project is licensed under the **MIT License**, which grants users the freed
 ---
 
 > GitHub [@michael-awe](https://github.com/michaelawe) &nbsp;&middot;&nbsp;
-> Twitter [@itsmichaelawe](https://twitter.com/itsmichaelawe)
 
