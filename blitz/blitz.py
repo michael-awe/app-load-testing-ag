@@ -23,7 +23,7 @@ async def make_request(session, url, status_codes, num_completed_requests, reque
         request_times.append((end - start) * 1000)
         return response
 
-async def measure_system_resources(memory_usage, cpu_usage, active_threads, network_usage, interval=0.1, samples=5):
+async def measure_system_resources(memory_usage, cpu_usage, active_threads, network_usage, interval=0.05, samples=5):
     """Measure system resources and append to lists. Samples every 0.1 seconds by default. Uses 5 samples to get an average sample by default."""
     
     process = psutil.Process()

@@ -51,6 +51,7 @@ async def run_load_test(request):
         measure_sys = asyncio.create_task(measure_system_resources(memory_usage, cpu_usage, active_threads, network_usage))
         await load_test(url, num_requests, status_codes, num_completed_requests, request_times)
         measure_sys.cancel()
+        active_threads.append(0)
         end = time.time()
 
     except:
@@ -68,8 +69,6 @@ async def run_load_test(request):
         else:
             num_200 += 1
 
-    print(len(status_codes))
-
 
     try:
         average_memory_usage = round(sum(memory_usage) / len(memory_usage),1)
@@ -80,6 +79,8 @@ async def run_load_test(request):
         average_cpu_usage = round(sum(cpu_usage) / len(cpu_usage), 1)
     except ZeroDivisionError:
         average_cpu_usage = 0
+
+    print(active_threads)
 
     return JsonResponse({
         'num_requests': num_requests,

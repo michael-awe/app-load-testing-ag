@@ -93,6 +93,8 @@ function initialize(){
 function displayResults(data){
     var inc = 1;
     console.log('displaying results')
+
+    console.log(data)
     
     //main container
     container = document.querySelector('.results');
@@ -142,17 +144,11 @@ function displayResults(data){
     interval = data.duration / num_memory_points;
     let memory_labels = [];
     let memory_data = [];
-    if (num_memory_points > 100){
-        inc = Math.ceil(num_memory_points/10)
-    } else{
-        inc = 1;
-    }
-    for(let i = 0; i < num_memory_points; i+=inc){
-        memory_labels.push((i * interval).toFixed(2)+'s');
+    for(let i = 0; i < num_memory_points; i++){
+        memory_labels.push(((i+1) * interval).toFixed(2)+'s');
         memory_data.push(data.memory_usage[i]);
     }
-
-    let memoryChart = new Chart(memory_graph, {
+    new Chart(memory_graph, {
         type: 'line',
         data: {
             labels: memory_labels,
@@ -165,24 +161,19 @@ function displayResults(data){
     });
 
     
-    //cpu graph
+    //Renders CPU graph
     num_cpu_points = data.cpu_usage.length;
     interval = data.duration / num_cpu_points;
     cpu_data = [];
-    let cpu_labels = [];
-    if (num_cpu_points > 100){
-        inc = Math.ceil(num_cpu_points/10)
-    } else{
-        inc = 1;
-    }
-    for(let i = 0; i < num_cpu_points; i+=inc){
-        cpu_labels.push((i * interval).toFixed(2)+'s');
+    cpu_labels = [];
+    for(let i = 0; i < num_cpu_points; i++){
+        cpu_labels.push(((i+1) * interval).toFixed(2)+'s');
         cpu_data.push(data.cpu_usage[i]);
     }
-    let cpuChart = new Chart(cpu_graph, {
+    new Chart(cpu_graph, {
         type: 'line',
         data: {
-            labels: memory_labels,
+            labels: cpu_labels,
             datasets: [{
                 label: 'CPU Usage (%)',
                 data: cpu_data,
@@ -191,50 +182,42 @@ function displayResults(data){
         options: options
     });
 
-    //active threads
+    //Renders Active Threads graph
     num_active_threads_points = data.active_threads.length;
     interval = data.duration / num_active_threads_points;
-    let active_threads_labels = [];
-    active_thread_data = [];
-    if(num_active_threads_points > 100){
-        inc = Math.ceil(num_active_threads_points/10)
-    } else{
-        inc = 1;
+    active_threads_labels = [];
+    active_threads_data = [];
+    for(let i = 0; i < data.active_threads.length; i++){
+        active_threads_labels.push(((i+1) * interval).toFixed(2)+'s');
+        active_threads_data.push(data.active_threads[i]);
     }
-    for(let i = 0; i < num_active_threads_points; i+=inc){
-        active_threads_labels.push((i * interval).toFixed(2)+'s');
-        active_thread_data.push(data.active_threads[i]);
-    }
-    let activeThreadsChart = new Chart(active_threads_graph, {
+
+    console.log(active_threads_data)
+    console.log(active_threads_labels)
+
+    new Chart(active_threads_graph, {
         type: 'line',
         data: {
-            labels: memory_labels,
+            labels: active_threads_labels,
             datasets: [{
                 label: 'Active Threads (#)',
-                data: active_thread_data,
+                data: active_threads_data,
             }],
         },
         options: options
     });
 
-    //response time
+    //Renders Response Time graph
     num_response_time_points = data.response_times.length;
     response_time_labels = [];
     response_time_data = [];
     interval = data.duration / num_response_time_points;
-    if (num_response_time_points > 100){
-        inc = Math.ceil(num_response_time_points/1)
-    } else{
-        inc = 1;
-    }
-    for(let i = 0; i < num_response_time_points; i+=inc){
-        response_time_labels.push((i * interval).toFixed(2)+'s');
+    for(let i = 0; i < num_response_time_points; i++){
+        response_time_labels.push(((i+1) * interval).toFixed(2)+'s');
         response_time_data.push(data.response_times[i]);
     }
 
-    console.log(num_response_time_points);
-    console.log(response_time_labels.length)
-    let responseTimeChart = new Chart(response_time_graph, {
+    new Chart(response_time_graph, {
         type: 'line',
         data: {
             labels: response_time_labels,
@@ -246,25 +229,22 @@ function displayResults(data){
         options: options
     });
 
-    //network
+    //Renders Network Usage graph
     num_network_points = data.network_usage['bytes_recv'].length;
     interval = data.duration / num_network_points;
     let network_labels = [];
     network_sent_data = [];
     network_recv_data = [];
-    if (num_network_points > 100){
-        inc = Math.ceil(num_network_points/10)
-    }
     for(let i = 0; i < num_network_points; i++){
-        network_labels.push((i * interval).toFixed(2)+'s');
+        network_labels.push(((i+1) * interval).toFixed(2)+'s');
         network_sent_data.push((data.network_usage['bytes_sent'])[i]);
         network_recv_data.push((data.network_usage['bytes_recv'])[i]);
     }
 
-    let networkChart = new Chart(network_graph, {
+    new Chart(network_graph, {
         type: 'line',
         data: {
-            labels: memory_labels,
+            labels: network_labels,
             datasets: [{
                 label: 'Bytes Sent(MB)',
                 data: network_sent_data,
@@ -277,11 +257,22 @@ function displayResults(data){
         options: options
     });
 
-    //show graphs
-    memory_graph.style.display = 'block';
-    cpu_graph.style.display = 'block';
-    active_threads_graph.style.display = 'block';
-    response_time_graph.style.display = 'block';
-    network_graph.style.display = 'block';
+}
 
+
+function renderLineChart(title, data, labels, graphElement){
+
+    new Chart(graphElement, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: title,
+                data: data,
+            }],
+        },
+        options: options
+    });
+
+    graphElement.style.display = 'block';
 }

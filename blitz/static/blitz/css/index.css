@@ -201,20 +201,38 @@ textarea:-webkit-autofill:focus{
 }
 
 .results .statistics{
-    display: grid;
-    grid-template-columns: repeat(4, 0.3fr);
+    display: flex;
+    flex-direction: column;
     gap: 15px;
     margin-bottom: 20px;
 }
 
+
+.statistics section{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.statistics p{
+    text-wrap: nowrap;
+}
+
 .chart-container{
+    flex:1;
     border-radius: 32px;
     padding: 20px;
     background-color: var(--secondary-foreground-color);
 }
+
+.chart-container canvas{
+    width: 100%;
+    height: 100%;
+}
 .results .graphs{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 15px;
 }
 
