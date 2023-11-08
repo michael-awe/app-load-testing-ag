@@ -8,7 +8,6 @@ async def load_test(url, num_requests, status_codes, num_completed_requests, req
     async with aiohttp.ClientSession() as session:
         tasks = [asyncio.ensure_future(make_request(session, url, status_codes, num_completed_requests, request_times)) for _ in range(num_requests)]
         results = await asyncio.gather(*tasks)
-        print(len(results))
     
     return "Done!"
             

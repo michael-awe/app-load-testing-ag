@@ -223,6 +223,7 @@ textarea:-webkit-autofill:focus{
     border-radius: 32px;
     padding: 20px;
     background-color: var(--secondary-foreground-color);
+    min-width: 300px;
 }
 
 .chart-container canvas{

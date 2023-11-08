@@ -32,6 +32,67 @@ function displayAlert(message, type){
     
 }
 
+function downSample(data){
+
+    if (data.length < 1000) return data;
+
+    console.log('downsampling')
+
+    let downsampled = [];
+    let binSize = Math.floor(data.length / 1000);
+
+    for (let i = 0; i < data.length; i += binSize) {
+        let block = data.slice(i, i + binSize); 
+        let average = block.reduce((total, b) => total + b, 0) / block.length; 
+        downsampled.push(average); 
+    }
+
+    return downsampled;
+
+}
+
+function renderLineChart(title, data,duration, graphElement){
+
+    let options = {
+        responsive: true,
+        scales: {
+            x: {
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                grid: {
+                  display: false
+                }
+            }
+        }
+    }
+
+    data = downSample(data);
+    graph_labels = [];
+    graph_data = [];
+
+    interval = duration/data.length;
+
+    for(let i = 0; i < data.length; i++){
+        graph_labels.push(((i+1) * interval).toFixed(2)+'s');
+        graph_data.push(data[i]);
+    }
+    new Chart(graphElement, {
+        type: 'line',
+        data: {
+            labels: graph_labels,
+            datasets: [{
+                label: title,
+                data: graph_data,
+            }],
+        },
+        options: options
+    });
+
+}
+
 //sends POST request to run load test   
 function initialize(){
 
@@ -121,158 +182,27 @@ function displayResults(data){
     response_time_graph = document.querySelector('#response_time_graph').getContext('2d');
     network_graph = document.querySelector('#network_graph').getContext('2d');
 
-
-    //graph config
-    var options = {
-        responsive: true,
-        scales: {
-            x: {
-                grid: {
-                  display: false
-                }
-              },
-              y: {
-                grid: {
-                  display: false
-                }
-            }
-        }
-    }
-
     //memory graph
-    num_memory_points = data.memory_usage.length;
-    interval = data.duration / num_memory_points;
-    let memory_labels = [];
-    let memory_data = [];
-    for(let i = 0; i < num_memory_points; i++){
-        memory_labels.push(((i+1) * interval).toFixed(2)+'s');
-        memory_data.push(data.memory_usage[i]);
-    }
-    new Chart(memory_graph, {
-        type: 'line',
-        data: {
-            labels: memory_labels,
-            datasets: [{
-                label: 'Memory Usage (MB)',
-                data: memory_data,
-            }],
-        },
-        options: options
-    });
-
+    renderLineChart('Memory Usage (MB)', data.memory_usage, data.duration, memory_graph)
     
     //Renders CPU graph
-    num_cpu_points = data.cpu_usage.length;
-    interval = data.duration / num_cpu_points;
-    cpu_data = [];
-    cpu_labels = [];
-    for(let i = 0; i < num_cpu_points; i++){
-        cpu_labels.push(((i+1) * interval).toFixed(2)+'s');
-        cpu_data.push(data.cpu_usage[i]);
-    }
-    new Chart(cpu_graph, {
-        type: 'line',
-        data: {
-            labels: cpu_labels,
-            datasets: [{
-                label: 'CPU Usage (%)',
-                data: cpu_data,
-            }],
-        },
-        options: options
-    });
+    renderLineChart('CPU Usage (%)',data.cpu_usage, data.duration, cpu_graph)
 
     //Renders Active Threads graph
-    num_active_threads_points = data.active_threads.length;
-    interval = data.duration / num_active_threads_points;
-    active_threads_labels = [];
-    active_threads_data = [];
-    for(let i = 0; i < data.active_threads.length; i++){
-        active_threads_labels.push(((i+1) * interval).toFixed(2)+'s');
-        active_threads_data.push(data.active_threads[i]);
-    }
-
-    console.log(active_threads_data)
-    console.log(active_threads_labels)
-
-    new Chart(active_threads_graph, {
-        type: 'line',
-        data: {
-            labels: active_threads_labels,
-            datasets: [{
-                label: 'Active Threads (#)',
-                data: active_threads_data,
-            }],
-        },
-        options: options
-    });
+    renderLineChart('Active Threads (#)', data.active_threads, data.duration, active_threads_graph);
 
     //Renders Response Time graph
-    num_response_time_points = data.response_times.length;
-    response_time_labels = [];
-    response_time_data = [];
-    interval = data.duration / num_response_time_points;
-    for(let i = 0; i < num_response_time_points; i++){
-        response_time_labels.push(((i+1) * interval).toFixed(2)+'s');
-        response_time_data.push(data.response_times[i]);
-    }
+    renderLineChart('Response Times (ms)', data.response_times, data.duration, response_time_graph)
 
-    new Chart(response_time_graph, {
-        type: 'line',
-        data: {
-            labels: response_time_labels,
-            datasets: [{
-                label: 'Response Time (ms)',
-                data: response_time_data,
-            }],
-        },
-        options: options
-    });
 
-    //Renders Network Usage graph
-    num_network_points = data.network_usage['bytes_recv'].length;
-    interval = data.duration / num_network_points;
-    let network_labels = [];
-    network_sent_data = [];
-    network_recv_data = [];
-    for(let i = 0; i < num_network_points; i++){
-        network_labels.push(((i+1) * interval).toFixed(2)+'s');
-        network_sent_data.push((data.network_usage['bytes_sent'])[i]);
-        network_recv_data.push((data.network_usage['bytes_recv'])[i]);
-    }
-
-    new Chart(network_graph, {
-        type: 'line',
-        data: {
-            labels: network_labels,
-            datasets: [{
-                label: 'Bytes Sent(MB)',
-                data: network_sent_data,
-            },
-            {
-                label: 'Bytes Received(MB)',
-                data: network_recv_data,
-            }],
-        },
-        options: options
-    });
+    //Renders Network Usage graphs
+    renderLineChart('Network Usage (MB)', data.network_usage['bytes_sent'], data.duration, network_graph)
+    renderLineChart('Network Usage (MB)', data.network_usage['bytes_recv'], data.duration, network_graph)
 
 }
 
 
-function renderLineChart(title, data, labels, graphElement){
 
-    new Chart(graphElement, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: title,
-                data: data,
-            }],
-        },
-        options: options
-    });
 
-    graphElement.style.display = 'block';
-}
+
+
