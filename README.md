@@ -68,5 +68,13 @@ This project is licensed under the **MIT License**, which grants users the freed
 
 ---
 
+### Disclaimer
+
+This load testing package is intended solely for lawful educational, research, and testing purposes. Users are explicitly forbidden from utilizing it for malicious or harmful activities such as unauthorized stress tests, Denial-of-Service (DoS) attacks, or any other actions targeted at disrupting the operation of third-party systems.
+
+Note that any damage or impairment caused to your own systems as a result of using this package is solely your responsibility. The author explicitly disclaims all liability for any consequences, direct or indirect, that may occur as a result of using this package. 
+
+Also, using this package improperly or in violation of applicable laws might expose you to legal consequences, including civil and criminal liability. The author will not be responsible for any such legal repercussions, nor for any damages, harm, or adverse outcomes alleged to result from directly or indirectly using this package.
+
 > GitHub [@michael-awe](https://github.com/michaelawe) &nbsp;&middot;&nbsp;
 
