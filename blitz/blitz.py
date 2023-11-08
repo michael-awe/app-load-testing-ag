@@ -27,6 +27,8 @@ async def measure_system_resources(memory_usage, cpu_usage, active_threads, netw
     """Measure system resources and append to lists. Samples every 0.1 seconds by default. Uses 5 samples to get an average sample by default."""
     
     process = psutil.Process()
+    start_bytes_sent = psutil.net_io_counters().bytes_sent
+    start_bytes_recv = psutil.net_io_counters().bytes_recv
     while True:
 
         temp_memory = []
@@ -42,8 +44,8 @@ async def measure_system_resources(memory_usage, cpu_usage, active_threads, netw
         #gets average memory usage and cpu usage
         memory = sum(temp_memory) / len(temp_memory)
         cpu = sum(temp_cpu) / len(temp_cpu)
-        bytes_sent = psutil.net_io_counters().bytes_sent/  1024 ** 2
-        bytes_recv = psutil.net_io_counters().bytes_recv/ 1024 ** 2
+        bytes_sent = (psutil.net_io_counters().bytes_sent-start_bytes_sent)/  (1024 ** 2)
+        bytes_recv = (psutil.net_io_counters().bytes_recv-start_bytes_recv)/ (1024 ** 2)
         network_usage.append((bytes_sent, bytes_recv))
 
         threads = len(asyncio.all_tasks())
